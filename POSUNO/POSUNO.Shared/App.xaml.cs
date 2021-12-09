@@ -9,6 +9,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -91,11 +92,18 @@ namespace POSUNO
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
+                    SaveParameters();
                     rootFrame.Navigate(typeof(LoginPage), args.Arguments);
                 }
                 // Ensure the current window is active
                 _window.Activate();
             }
+        }
+
+        private void SaveParameters()
+        {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values["ApiUrl"] = "https://www.heracomp.net/POSUNO/api/";
         }
 
         /// <summary>
