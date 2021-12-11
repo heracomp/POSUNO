@@ -51,7 +51,17 @@ namespace POSUNO.Api.Controllers
             {
                 return BadRequest();
             }
-
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == customer.User.Email);
+            if (user == null)
+            {
+                return BadRequest("Usuario no existe.");
+            }
+            Customer oldcustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
+            if (oldcustomer != null)
+            {
+                return BadRequest("Ya existe un cliente registrado con ese email.");
+            }
+            customer.User = user;
             _context.Entry(customer).State = EntityState.Modified;
 
             try
@@ -70,7 +80,7 @@ namespace POSUNO.Api.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(customer);
         }
 
         // POST: api/Customers
@@ -78,6 +88,18 @@ namespace POSUNO.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
+            User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == customer.User.Email);
+            if (user == null)
+            {
+                return BadRequest("Usuario no existe.");
+            }
+
+            Customer oldCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
+            if (oldCustomer != null)
+            {
+                return BadRequest("Ya existe un cliente registrado con ese email.");
+            }
+            customer.User = user;
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
