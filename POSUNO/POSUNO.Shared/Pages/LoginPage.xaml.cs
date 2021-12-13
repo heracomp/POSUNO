@@ -57,8 +57,8 @@ namespace POSUNO.Pages
                 await messageDialog.ShowAsync();
                 return;
             }
-            User user = (User)response.Result;
-            if (user == null)
+            TokenResponse tokenResponse = (TokenResponse)response.Result;
+            if (tokenResponse == null)
             {
                 messageDialog = new MessageDialog("Usuario o contraseña incorretos.", "Error");
                 await messageDialog.ShowAsync();
@@ -66,7 +66,7 @@ namespace POSUNO.Pages
             }
             //messageDialog = new MessageDialog($"Bienvenido: {user.FullName}", "Ok");
             //await messageDialog.ShowAsync();
-            Frame.Navigate(typeof(MainPage), user);
+            Frame.Navigate(typeof(MainPage), tokenResponse);
         }
 
         private async Task<bool> ValidForm()

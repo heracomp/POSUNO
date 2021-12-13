@@ -1,114 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using POSUNO.Api.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using POSUNO.Api.Data.Entities;
+using POSUNO.Api.Helpers;
 using POSUNO.Api.Models;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace POSUNO.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    [Route("api/[controller]")]
+    public class AccountController: Controller
     {
-        private readonly DataContext _context;
+        private readonly IUserHelper _userHelper;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(DataContext context)
+        public AccountController(IUserHelper userHelper,IConfiguration configuration)
         {
-            _context = context;
-        }
-
-        // GET: api/Account
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
-
-        // GET: api/Account/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
-        }
-
-        // PUT: api/Account/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            _userHelper = userHelper;
+            _configuration = configuration;
         }
         [HttpPost]
-        [Route("Login")]
-        public async Task<ActionResult<User>> Login(LoginRequest model)
+        [Route("CreateToken")]
+        public async Task<IActionResult> CreateToken([FromBody] LoginRequest model)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
-        
-        }
-
-        // POST: api/Account
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-
-        // DELETE: api/Account/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                User user = await _userHelper.GetUserAsync(model.Email);
+                if (user != null)
+                {
+                    Microsoft.AspNetCore.Identity.SignInResult result = await _userHelper.ValidatePasswordAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        Claim[] claims = new[]
+                        {
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                        };
+
+                        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+                        SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                        JwtSecurityToken token = new JwtSecurityToken(
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
+                            claims,
+                            expires: DateTime.UtcNow.AddDays(3), //3 dias
+                            signingCredentials: credentials);
+                        var results = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo,
+                            user
+                        };
+                        return Created(string.Empty, results);
+                    }
+                }
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
+            return BadRequest();
         }
     }
 }

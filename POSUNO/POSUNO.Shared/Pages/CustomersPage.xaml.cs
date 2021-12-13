@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -25,7 +26,7 @@ namespace POSUNO.Pages
             InitializeComponent();
         }
         public ObservableCollection<Customer> Customers { get; set; }
-
+        private string token;
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -36,9 +37,10 @@ namespace POSUNO.Pages
         {
             Loader loader = new Loader("Por favor espere...");
             loader.Show();
-            Response response = await ApiService.GetListAsync<Customer>("customers");
-            loader.Close();
+            token = MainPage.GetInstance().TokenResponse.Token;
 
+            Response response = await ApiService.GetListAsync<Customer>("customers",token);
+            loader.Close();
             if (!response.IsSuccesss)
             {
                 MessageDialog dialog = new MessageDialog(response.Message, "Error al cargar los clientes");
@@ -66,11 +68,11 @@ namespace POSUNO.Pages
                 return;
             }
 
-            customer.User = MainPage.GetInstance().User;
+            customer.User = MainPage.GetInstance().TokenResponse.User;
 
             Loader loader = new Loader("Por favor espere...");
             loader.Show();
-            Response response = await ApiService.PostAsync<Customer>("Customers", customer);
+            Response response = await ApiService.PostAsync<Customer>("Customers", customer,token);
             loader.Close();
             if (!response.IsSuccesss)
             {
@@ -93,11 +95,11 @@ namespace POSUNO.Pages
                 return;
             }
 
-            customer.User = MainPage.GetInstance().User;
+            customer.User = MainPage.GetInstance().TokenResponse.User;
 
             Loader loader = new Loader("Por favor espere...");
             loader.Show();
-            Response response = await ApiService.PutAsync<Customer>("Customers", customer,customer.Id);
+            Response response = await ApiService.PutAsync<Customer>("Customers", customer,customer.Id,token);
             loader.Close();
             if (!response.IsSuccesss)
             {
@@ -109,6 +111,40 @@ namespace POSUNO.Pages
             Customer oldcustomer = Customers.FirstOrDefault(c => c.Id == newcustomer.Id);
             oldcustomer = newcustomer;
             RefreshList();
+        }
+        private async void DeleteImage_Click(object sender, TappedRoutedEventArgs e)
+        {
+            ContentDialogResult result = await ConfirmDeleteAsync();
+            if(result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+            Loader loader = new Loader("Por favor espere...");
+            loader.Show();
+            Customer customer = Customers[CustomersListView.SelectedIndex];
+            Response response = await ApiService.DeleteAsync("Customers", customer.Id,token);
+            loader.Close();
+            if (!response.IsSuccesss)
+            {
+                MessageDialog dialog = new MessageDialog(response.Message, "Error al eliminar el cliente");
+                await dialog.ShowAsync();
+                return;
+            }
+            List<Customer> customers = Customers.Where(c => c.Id != customer.Id).ToList();
+            Customers = new ObservableCollection<Customer>(customers);
+            RefreshList();
+        }
+
+        private async Task<ContentDialogResult> ConfirmDeleteAsync()
+        {
+            ContentDialog confirmDialog = new ContentDialog()
+            {
+                Title = "Confirmación",
+                Content= "¿Estás seguro que deseas eliminar el registro?",
+                PrimaryButtonText="Si",
+                CloseButtonText="No"
+            };
+            return await confirmDialog.ShowAsync();
         }
     }
 }

@@ -103,8 +103,8 @@ namespace POSUNO
         private void SaveParameters()
         {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            //localSettings.Values["ApiUrl"] = "https://www.heracomp.net/POSUNO/api/";
-            localSettings.Values["ApiUrl"] = "https://localhost:44343/";
+            localSettings.Values["ApiUrl"] = "https://www.heracomp.net/POSUNO/api/";
+            //localSettings.Values["ApiUrl"] = "https://localhost:44343/";
         }
 
         /// <summary>

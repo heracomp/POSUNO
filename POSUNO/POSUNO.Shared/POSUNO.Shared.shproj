@@ -12,7 +12,9 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
   <ItemGroup>
     <_Globbed_Compile Remove="Components\Loader.xaml.cs" />
+    <_Globbed_Compile Remove="Dilalogs\CustomerDialog - Copy.xaml.cs" />
     <_Globbed_Compile Remove="Dilalogs\CustomerDialog.xaml.cs" />
+    <_Globbed_Compile Remove="Dilalogs\ProductDialog.xaml.cs" />
     <_Globbed_Compile Remove="Helpers\ApiService.cs" />
     <_Globbed_Compile Remove="Helpers\RegexUtilities.cs" />
     <_Globbed_Compile Remove="Helpers\Settings.cs" />
@@ -21,6 +23,7 @@
     <_Globbed_Compile Remove="Models\LoginRequest.cs" />
     <_Globbed_Compile Remove="Models\Product.cs" />
     <_Globbed_Compile Remove="Models\Response.cs" />
+    <_Globbed_Compile Remove="Models\TokenResponse.cs" />
     <_Globbed_Compile Remove="Models\User.cs" />
     <_Globbed_Compile Remove="Pages\ClientesPage.xaml.cs" />
     <_Globbed_Compile Remove="Pages\CustomersPage.xaml.cs" />
@@ -32,6 +35,7 @@
   <ItemGroup>
     <_Globbled_Page Remove="Components\Loader.xaml" />
     <_Globbled_Page Remove="Dilalogs\CustomerDialog.xaml" />
+    <_Globbled_Page Remove="Dilalogs\ProductDialog.xaml" />
     <_Globbled_Page Remove="Pages\ClientesPage.xaml" />
     <_Globbled_Page Remove="Pages\CustomersPage.xaml" />
     <_Globbled_Page Remove="Pages\InicioPage.xaml" />

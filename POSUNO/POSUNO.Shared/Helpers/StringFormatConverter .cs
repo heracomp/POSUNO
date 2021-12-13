@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
 namespace POSUNO.Helpers
@@ -18,10 +19,28 @@ namespace POSUNO.Helpers
             return string.Format((string)parameter, value);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter,
-            string language)
+        public object ConvertBack(object value, Type targetType, object parameter,string language)
         {
-            throw new NotImplementedException();
+            string strValue = value as string;
+            var d=strValue.Replace("$", "").Replace(",", "");
+
+            DateTime resultDateTime;
+            if (targetType == typeof(DateTime) && DateTime.TryParse(strValue, out resultDateTime))
+            {
+                return resultDateTime;
+            }
+            decimal decValue;
+            if (targetType == typeof(decimal) && decimal.TryParse(d , out decValue))
+            {
+                return decValue;
+            }
+            float floatValue;
+            if (targetType == typeof(float) && float.TryParse(d, out floatValue))
+            {
+                return floatValue;
+            }
+            return DependencyProperty.UnsetValue;
+
         }
     }
 }

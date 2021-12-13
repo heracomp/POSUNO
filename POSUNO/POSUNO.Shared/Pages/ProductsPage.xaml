@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <TextBlock Text="Productos" HorizontalAlignment="Center"  FontSize="30" FontWeight="Bold"/>
-            <Button Content="Adiccionar Producto" HorizontalAlignment="Right" Background="Navy" Foreground="White" Margin="0,-40,0,0"/>
+            <Button Content="Adiccionar Producto" HorizontalAlignment="Right" Background="Navy" Foreground="White" Margin="0,-40,0,0" Tapped="AddProductsButton_Click"/>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -29,16 +29,15 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="90"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" FontWeight="Bold" HorizontalTextAlignment="Left"  Text="Nombre" />
-                <TextBlock Grid.Column="2" FontWeight="Bold" HorizontalTextAlignment="Left"  Text="Descripción"/>
-                <TextBlock Grid.Column="3" FontWeight="Bold" HorizontalTextAlignment="Left"  Text="Precio"/>
-                <TextBlock Grid.Column="4" FontWeight="Bold" HorizontalTextAlignment="Left"  Text="Stock"/>
-                <TextBlock Grid.Column="5" FontWeight="Bold" HorizontalTextAlignment="Center"  Text="Está Activo"/>
-                <TextBlock Grid.Column="6" FontWeight="Bold" HorizontalTextAlignment="Center"  Text="Acción"/>
+                <TextBlock Grid.Column="0" FontWeight="Bold" Text="Nombre" />
+                <TextBlock Grid.Column="1" FontWeight="Bold" Text="Descripción"/>
+                <TextBlock Grid.Column="2" FontWeight="Bold" Text="Precio"/>
+                <TextBlock Grid.Column="3" FontWeight="Bold" Text="Stock"/>
+                <TextBlock Grid.Column="4" FontWeight="Bold" Text="Está Activo"/>
+                <TextBlock Grid.Column="5" FontWeight="Bold" Text="Acción"/>
             </Grid>
             <Border Background="Black" Height="2" Margin="0,5"/>
         </StackPanel>
@@ -66,11 +65,11 @@
                             <TextBlock Grid.Column="0" VerticalAlignment="Center"  FontSize="14" TextWrapping="Wrap" Text="{x:Bind Name}" />
                             <TextBlock Grid.Column="1" VerticalAlignment="Center"  FontSize="14" TextWrapping="Wrap" Text="{x:Bind Description}"/>
                             <TextBlock Grid.Column="2" VerticalAlignment="Center"  FontSize="14" TextWrapping="Wrap" Text="{x:Bind Price , Converter={StaticResource sfconver}, ConverterParameter='{}{0:C2}'}"/>
-                            <TextBlock Grid.Column="3" VerticalAlignment="Center"  FontSize="14" TextWrapping="Wrap" Text="{x:Bind stock , Converter={StaticResource sfconver}, ConverterParameter='{}{0:N2}'}"/>
-                            <CheckBox Grid.Column="4" VerticalAlignment="Center" FontSize="14" IsEnabled="False" HorizontalAlignment="Center" IsChecked="{x:Bind IsActive}"/>
+                            <TextBlock Grid.Column="3" VerticalAlignment="Center"  FontSize="14" TextWrapping="Wrap" Text="{x:Bind stock , Converter={StaticResource sfconver}, ConverterParameter='{}{0:#,##0}'}"/>
+                            <CheckBox Grid.Column="4" VerticalAlignment="Center"  IsEnabled="False"  IsChecked="{x:Bind IsActive}" />
                             <StackPanel Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal" >
-                                <Image Source="/Assets/edit.png" Margin="5,0" Height="25" VerticalAlignment="Center"/>
-                                <Image Source="/Assets/delete.png" Margin="5,0" Height="25" VerticalAlignment="Center"/>
+                                <Image Source="/Assets/edit.png" Margin="5,0" Height="25" VerticalAlignment="Center" Tapped="EditImage_Click"/>
+                                <Image Source="/Assets/delete.png" Margin="5,0" Height="25" VerticalAlignment="Center" Tapped="DeleteImage_Click"/>
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
